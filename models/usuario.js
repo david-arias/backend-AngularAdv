@@ -17,6 +17,7 @@ var usuarioSchema = new Schema( {
      userPsswrd: { type: String, required: [true, 'La contraseña es obligatoria']  },
      img: { type: String, required: false, default: null },
      role: { type: String, required: true, default: 'USER_ROLE', enum: userRoles },
+     google: { type: Boolean, required: false, default: false }
 
 } );
 
