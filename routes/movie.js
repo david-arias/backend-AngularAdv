@@ -1,9 +1,6 @@
 
 // Requires
 var express = require('express');
-var bcrypt = require('bcryptjs');
-
-var jwt = require('jsonwebtoken');
 
 var mdAutenticacion = require('../middlewares/autenticacion');
 
@@ -11,68 +8,67 @@ var mdAutenticacion = require('../middlewares/autenticacion');
 var app = express();
 
 // modelos
-var Usuario = require('../models/usuario')
+var Movie = require('../models/movie');
 
 // ================================================
-// GET all users
+// GET all companies
 // ================================================
 app.get('/', ( req, res, next ) => {
 
      var from = req.query.from || 0;
      from = Number(from);
 
-     Usuario.find({}, 'userName userMail img role')
+     Movie.find({})
           .skip(from)
           .limit(5)
+          .populate('user', 'userName userMail')
+          .populate('company')
           .exec(
 
-               (err, users) => {
+               (err, movies) => {
           
                     if ( err ) {
                          return res.status(500).json({
                               ok: false,
-                              mssg: "Error en base de datos | carga de usuarios",
+                              mssg: "Error en base de datos | carga de peliculas",
                               errors: err
                          })
                     }
 
-                    Usuario.count({}, (err, count) => {
+                    Movie.count({}, (err, count) => {
                          if ( err ) {
                               return res.status(500).json({
                                    ok: false,
-                                   mssg: "Error en base de datos | conteo de usuarios",
+                                   mssg: "Error en base de datos | conteo de peliculas",
                                    errors: err
                               })
                          }
-                         
+               
                          res.status(200).json({
                               ok: true,
-                              totalUsers: count,
-                              mssg: "Usuarios cargados",
-                              users: users,
+                              totalMovies: count,
+                              mssg: "peliculas cargados",
+                              companies: movies,
                          })
                     })
-          
                }
           )
 } )
 
 // ================================================
-// POST new user
+// POST new company
 // ================================================
 app.post('/', mdAutenticacion.verifyToken, ( req, res ) => {
 
      var body = req.body;
 
-     var user = new Usuario({
-          userName: body.userName,
-          userMail: body.userMail,
-          userPsswrd: bcrypt.hashSync( body.userPsswrd, 10 ),
-          img: body.img,
-          role: body.role
+     var movie = new Movie({
+          movieName: body.movieName,
+          company: body.company,
+          user: req.user._id
      });
-     
-     user.save( ( err, saveUser ) => {
+
+     movie.save( ( err, saveMovie ) => {
           if ( err ) {
                return res.status(400).json({
                     ok: false,
@@ -83,7 +79,7 @@ app.post('/', mdAutenticacion.verifyToken, ( req, res ) => {
           
           res.status(201).json({
                ok: true,
-               user: saveUser,
+               user: saveMovie,
                adminUser: req.user
           })
      } )
@@ -91,87 +87,84 @@ app.post('/', mdAutenticacion.verifyToken, ( req, res ) => {
 });
 
 // ================================================
-// PUT update user
+// PUT update movie
 // ================================================
-app.put( '/:id', mdAutenticacion.verifyToken , ( req, res ) => {
+app.put('/:id', mdAutenticacion.verifyToken, ( req, res ) => {
 
      var id = req.params.id;
      var body = req.body;
 
-     Usuario.findById( id, ( err, user ) => {
+     Movie.findById( id, ( err, movie ) => {
 
           if ( err ) {
                return res.status(500).json({
                     ok: false,
-                    mssg: "Error en base de datos | error al buscar usuario",
+                    mssg: "Error en base de datos | error al buscar pelicula",
                     errors: err
                })
           }
-          if ( !user ) {
+          if ( !movie ) {
                return res.status(400).json({
                     ok: false,
-                    mssg: "Error en base de datos | usuario no existe",
-                    errors: { message: 'No existe un usuario con el ID: ' + id }
+                    mssg: "Error en base de datos | pelicula no existe",
+                    errors: { message: 'No existe una pelicula con el ID: ' + id }
                })
           }
 
-          user.userName = body.userName;
-          user.userMail = body.userMail;
-          user.role = body.role;
+          movie.movieName = body.movieName,
+          movie.company = body.company,
+          movie.user = req.user._id
 
-          user.save( (err, userSaved ) => {
+          movie.save( (err, movieSaved ) => {
 
                if ( err ) {
                     return res.status(400).json({
                          ok: false,
-                         mssg: "Error en base de datos | No es posible actualizar usuario",
+                         mssg: "Error en base de datos | No es posible actualizar productora",
                          errors: err
                     })
                }
-
-               userSaved.userPsswrd = ';)';
-
                res.status(200).json({
                     ok: true,
-                    user: userSaved
+                    user: movieSaved
                });
 
           } );
 
-     } );
-
+     });
 })
 
 // ================================================
 // DELETE delete by id user
 // ================================================
-app.delete( '/:id', mdAutenticacion.verifyToken , ( req,res ) => {
+app.delete('/:id', mdAutenticacion.verifyToken, ( req, res ) => {
      var id = req.params.id;
 
-     Usuario.findByIdAndRemove( id, ( err, userDeleted ) => {
+     Movie.findByIdAndRemove( id, ( err, movieDeleted ) => {
 
           if ( err ) {
                return res.status(500).json({
                     ok: false,
-                    mssg: "Error en base de datos | No es posible borrar usuario",
+                    mssg: "Error en base de datos | No es posible borrar pelicula",
                     errors: err
                })
           }
-          if ( !userDeleted ) {
+          if ( !movieDeleted ) {
                return res.status(400).json({
                     ok: false,
-                    mssg: "Error en base de datos | No existe usuario",
-                    errors: { message: 'no existe usuario con ese ID' }
+                    mssg: "Error en base de datos | No existe pelicula",
+                    errors: { message: 'no existe pelicula con ese ID' }
                })
           }
 
           res.status(200).json({
                ok: true,
-               user: userDeleted
+               user: movieDeleted
           });
 
      })
 })
+
 
 
 

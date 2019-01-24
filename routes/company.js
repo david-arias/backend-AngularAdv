@@ -1,9 +1,6 @@
 
 // Requires
 var express = require('express');
-var bcrypt = require('bcryptjs');
-
-var jwt = require('jsonwebtoken');
 
 var mdAutenticacion = require('../middlewares/autenticacion');
 
@@ -11,68 +8,65 @@ var mdAutenticacion = require('../middlewares/autenticacion');
 var app = express();
 
 // modelos
-var Usuario = require('../models/usuario')
+var Company = require('../models/company');
 
 // ================================================
-// GET all users
+// GET all companies
 // ================================================
 app.get('/', ( req, res, next ) => {
 
      var from = req.query.from || 0;
      from = Number(from);
 
-     Usuario.find({}, 'userName userMail img role')
+     Company.find({})
           .skip(from)
           .limit(5)
+          .populate('user', 'userName userMail')
           .exec(
-
-               (err, users) => {
+               (err, comps) => {
           
                     if ( err ) {
                          return res.status(500).json({
                               ok: false,
-                              mssg: "Error en base de datos | carga de usuarios",
+                              mssg: "Error en base de datos | carga de productoras",
                               errors: err
                          })
                     }
-
-                    Usuario.count({}, (err, count) => {
+                    
+                    Company.count({}, (err, count) => {
                          if ( err ) {
                               return res.status(500).json({
                                    ok: false,
-                                   mssg: "Error en base de datos | conteo de usuarios",
+                                   mssg: "Error en base de datos | conteo de productoras",
                                    errors: err
                               })
                          }
-                         
+
                          res.status(200).json({
                               ok: true,
-                              totalUsers: count,
-                              mssg: "Usuarios cargados",
-                              users: users,
+                              totalCompanies: count,
+                              mssg: "productoras cargados",
+                              companies: comps,
                          })
-                    })
+                    });
           
                }
           )
 } )
 
 // ================================================
-// POST new user
+// POST new company
 // ================================================
 app.post('/', mdAutenticacion.verifyToken, ( req, res ) => {
 
      var body = req.body;
 
-     var user = new Usuario({
-          userName: body.userName,
-          userMail: body.userMail,
-          userPsswrd: bcrypt.hashSync( body.userPsswrd, 10 ),
-          img: body.img,
-          role: body.role
+     var comp = new Company({
+          compName: body.compName,
+          user: req.user._id
      });
-     
-     user.save( ( err, saveUser ) => {
+
+     comp.save( ( err, saveComp ) => {
           if ( err ) {
                return res.status(400).json({
                     ok: false,
@@ -83,7 +77,7 @@ app.post('/', mdAutenticacion.verifyToken, ( req, res ) => {
           
           res.status(201).json({
                ok: true,
-               user: saveUser,
+               user: saveComp,
                adminUser: req.user
           })
      } )
@@ -91,87 +85,84 @@ app.post('/', mdAutenticacion.verifyToken, ( req, res ) => {
 });
 
 // ================================================
-// PUT update user
+// PUT update company
 // ================================================
-app.put( '/:id', mdAutenticacion.verifyToken , ( req, res ) => {
+app.put('/:id', mdAutenticacion.verifyToken, ( req, res ) => {
 
      var id = req.params.id;
      var body = req.body;
 
-     Usuario.findById( id, ( err, user ) => {
+     Company.findById( id, ( err, comp ) => {
 
           if ( err ) {
                return res.status(500).json({
                     ok: false,
-                    mssg: "Error en base de datos | error al buscar usuario",
+                    mssg: "Error en base de datos | error al buscar productora",
                     errors: err
                })
           }
-          if ( !user ) {
+          if ( !comp ) {
                return res.status(400).json({
                     ok: false,
-                    mssg: "Error en base de datos | usuario no existe",
+                    mssg: "Error en base de datos | productora no existe",
                     errors: { message: 'No existe un usuario con el ID: ' + id }
                })
           }
 
-          user.userName = body.userName;
-          user.userMail = body.userMail;
-          user.role = body.role;
+          comp.compName = body.compName;
+          comp.user = req.user._id;
 
-          user.save( (err, userSaved ) => {
+          comp.save( (err, compSaved ) => {
 
                if ( err ) {
                     return res.status(400).json({
                          ok: false,
-                         mssg: "Error en base de datos | No es posible actualizar usuario",
+                         mssg: "Error en base de datos | No es posible actualizar productora",
                          errors: err
                     })
                }
-
-               userSaved.userPsswrd = ';)';
-
                res.status(200).json({
                     ok: true,
-                    user: userSaved
+                    user: compSaved
                });
 
           } );
 
-     } );
-
+     });
 })
 
 // ================================================
 // DELETE delete by id user
 // ================================================
-app.delete( '/:id', mdAutenticacion.verifyToken , ( req,res ) => {
+app.delete('/:id', mdAutenticacion.verifyToken, ( req, res ) => {
      var id = req.params.id;
 
-     Usuario.findByIdAndRemove( id, ( err, userDeleted ) => {
+     Company.findByIdAndRemove( id, ( err, compDeleted ) => {
 
           if ( err ) {
                return res.status(500).json({
                     ok: false,
-                    mssg: "Error en base de datos | No es posible borrar usuario",
+                    mssg: "Error en base de datos | No es posible borrar productora",
                     errors: err
                })
           }
-          if ( !userDeleted ) {
+          if ( !compDeleted ) {
                return res.status(400).json({
                     ok: false,
-                    mssg: "Error en base de datos | No existe usuario",
-                    errors: { message: 'no existe usuario con ese ID' }
+                    mssg: "Error en base de datos | No existe productora",
+                    errors: { message: 'no existe productora con ese ID' }
                })
           }
 
           res.status(200).json({
                ok: true,
-               user: userDeleted
+               user: compDeleted
           });
 
      })
 })
+
+
 
 
 

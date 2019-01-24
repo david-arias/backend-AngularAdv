@@ -5,7 +5,9 @@ var express = require('express');
 // inicializar variables
 var app = express();
 
-// rutas
+// ================================================
+// GET 
+// ================================================
 app.get('/', ( req, res, next ) => {
 
      res.status(200).json({

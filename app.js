@@ -19,6 +19,14 @@ var appRoutes = require('./routes/app')
 var usuarioRoutes = require('./routes/usuario')
 var loginRoutes = require('./routes/login')
 
+var companyRoutes = require('./routes/company')
+var movieRoutes = require('./routes/movie')
+
+var searchRoutes = require('./routes/search')
+
+var uploadRoutes = require('./routes/upload')
+var imgRoutes = require('./routes/img')
+
 // conexión a base de datos
 mongoose.connection.openUri('mongodb://localhost:27017/adminDB', ( err , res ) => {
      if ( err ) throw err;
@@ -27,8 +35,17 @@ mongoose.connection.openUri('mongodb://localhost:27017/adminDB', ( err , res ) =
 })
 
 // rutas
+app.use('/img', imgRoutes);
+app.use('/upload', uploadRoutes);
+
+app.use('/search', searchRoutes);
+
+app.use('/movie', movieRoutes);
+app.use('/company', companyRoutes);
+
 app.use('/login', loginRoutes);
 app.use('/usuario', usuarioRoutes);
+
 app.use('/', appRoutes);
 
 
