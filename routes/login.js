@@ -146,21 +146,14 @@ app.post('/google', async ( req, res, next ) => {
                user.userPsswrd = ':)';
 
                user.save( (err, userDb) => {
-                    if ( err ) {
-                         return res.status( 500 ).json({
-                              ok: false,
-                              mssg: "Error crear usuario google | usuario repetido",
-                              error: { mssg: 'error creacin usuario google', err }
-                         })
-                    }
 
                     var token = jwt.sign({ user: userDb }, SEED, {expiresIn: 14400}) // 4 horas
 
                     res.status(200).json({
                          ok: true,
-                         usuario: userDb,
+                         usuario: user,
                          token: token,
-                         id: userDb._id,
+                         // id: userDb._id,
                     })
 
 

@@ -60,7 +60,7 @@ app.get('/', ( req, res, next ) => {
 // ================================================
 // POST new user
 // ================================================
-app.post('/', mdAutenticacion.verifyToken, ( req, res ) => {
+app.post('/', ( req, res ) => {
 
      var body = req.body;
 
