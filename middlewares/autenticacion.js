@@ -27,3 +27,40 @@ exports.verifyToken = function ( req,res,next ) {
           // })
      })
 } 
+
+// ================================================
+// Verify ADMIN
+// ================================================
+exports.verifyAdmin = function ( req,res,next ) {
+
+     var user = req.user;
+
+     if ( user.role === 'ADMIN_ROLE' ) {
+          next();
+          return;
+     } else {
+          return res.status(401).json({
+               ok: false,
+               mssg: "Error de token",
+          })
+     }
+} 
+
+// ================================================
+// Verify ADMIN o mismo usuario
+// ================================================
+exports.verifyAdminOrUser = function ( req,res,next ) {
+
+     var user = req.user;
+     var id = req.params.id;
+
+     if ( user.role === 'ADMIN_ROLE' || user._id === id ) {
+          next();
+          return;
+     } else {
+          return res.status(401).json({
+               ok: false,
+               mssg: "Error de token",
+          })
+     }
+} 

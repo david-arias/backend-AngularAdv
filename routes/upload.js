@@ -174,15 +174,15 @@ function uploadByKind( kind, id, fileName, res ) {
                     if ( err ) {
                          return res.status(500).json({
                               ok: false,
-                              mssg: "Error al actualizar usuario",
+                              mssg: "Error al actualizar productora",
                               error: { mssg: "error" + err}
                          })
                     }
 
                     return res.status(200).json({
                          ok: true,
-                         mssg: 'Imagen de usuario actualizado',
-                         user: updatedComp
+                         mssg: 'Imagen de productora actualizado',
+                         company: updatedComp
                     })
 
                })
@@ -219,15 +219,15 @@ function uploadByKind( kind, id, fileName, res ) {
                     if ( err ) {
                          return res.status(500).json({
                               ok: false,
-                              mssg: "Error al actualizar usuario",
+                              mssg: "Error al actualizar pelicula",
                               error: { mssg: "error" + err}
                          })
                     }
 
                     return res.status(200).json({
                          ok: true,
-                         mssg: 'Imagen de usuario actualizado',
-                         user: updatedMovie
+                         mssg: 'Imagen de pelicula actualizado',
+                         movie: updatedMovie
                     })
 
                })
@@ -264,15 +264,15 @@ function uploadByKind( kind, id, fileName, res ) {
                     if ( err ) {
                          return res.status(500).json({
                               ok: false,
-                              mssg: "Error al actualizar usuario",
+                              mssg: "Error al actualizar pelicula",
                               error: { mssg: "error" + err}
                          })
                     }
 
                     return res.status(200).json({
                          ok: true,
-                         mssg: 'Imagen de usuario actualizado',
-                         user: updatedMovie
+                         mssg: 'Imagen de pelicula actualizado',
+                         movie: updatedMovie
                     })
 
                })

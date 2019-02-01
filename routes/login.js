@@ -60,6 +60,7 @@ app.post('/', ( req,res ) => {
                usuario: userDb,
                token: token,
                id: userDb._id,
+               menu: getUsrMenu( userDb.role ),
           })
 
      } )
@@ -133,6 +134,7 @@ app.post('/google', async ( req, res, next ) => {
                          usuario: userDb,
                          token: token,
                          id: userDb._id,
+                         menu: getUsrMenu( userDb.role ),
                     })
                }
           } else {
@@ -153,6 +155,7 @@ app.post('/google', async ( req, res, next ) => {
                          ok: true,
                          usuario: user,
                          token: token,
+                         menu: getUsrMenu( user.role ),
                          // id: userDb._id,
                     })
 
@@ -162,6 +165,90 @@ app.post('/google', async ( req, res, next ) => {
      } )
 
 } )
+
+
+// ================================================
+// GET MENU 
+// ================================================
+function getUsrMenu( role ) {
+
+     menu = [
+          {
+               titulo: 'Personal',
+               menu: [
+                    {
+                         titulo: 'Dashboard',
+                         icon: 'fas fa-tachometer-alt ',
+                         url: '#',
+                         submenu: [
+                              {
+                                   titulo: 'Dashboard',
+                                   icon: 'fas fa-tachometer-alt ',
+                                   url: '/dashboard',
+                              }
+                         ]
+                    }
+               ]
+          },
+          {
+               titulo: null,
+               menu: [
+                    {
+                         titulo: 'Mantenimiento',
+                         icon: 'fas fa-toolbox',
+                         url: '#',
+                         submenu: [
+                         
+                         ]
+                    }
+               ]
+          },
+          {
+               titulo: null,
+               menu: [
+                    {
+                         titulo: 'Temporal',
+                         icon: 'far fa-clock',
+                         url: '#',
+                         submenu: [
+                              {
+                                   titulo: 'Promesas',
+                                   icon: 'fas fa-stopwatch',
+                                   url: '/promesas',
+                              }, {
+                                   titulo: 'RxJs',
+                                   icon: 'fas fa-stopwatch',
+                                   url: '/rxjs',
+                              }
+                         ]
+                    }
+               ]
+          }
+     ]
+
+     if ( role === 'ADMIN_ROLE' ) {
+          menu[1]['menu'][0].submenu.unshift(
+               {
+                    titulo: 'Usuarios',
+                    icon: 'fas fa-users-cog',
+                    url: '/user-config',
+               },
+               {
+                    titulo: 'Productoras',
+                    icon: 'fas fa-video',
+                    url: '/prods-config',
+               },
+               {
+                    titulo: 'Peliculas',
+                    icon: 'fas fa-film',
+                    url: '/movies-config',
+               },
+          )
+     }
+
+     return menu;
+
+}
 
 
 

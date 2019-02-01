@@ -55,9 +55,40 @@ app.get('/', ( req, res, next ) => {
 } )
 
 // ================================================
+// GET company by ID
+// ================================================
+app.get('/:id', ( req, res ) => {
+     var id = req.params.id;
+
+     Company.findById( id )
+     .populate('user', 'userName userMail img')
+     .exec( (err, company) => {
+          if ( err ) {
+               return res.status(500).json({
+                    ok: false,
+                    mssg: "Error en base de datos | carga de productoras por ID",
+                    errors: err
+               })
+          }
+          if ( !company ) {
+               return res.status(400).json({
+                    ok: false,
+                    mssg: "Error en base de datos | No existe hospital con ese ID",
+                    errors: err
+               })
+          }
+
+          res.status(200).json({
+               ok: true,
+               company: company,
+          })
+     })
+})
+
+// ================================================
 // POST new company
 // ================================================
-app.post('/', mdAutenticacion.verifyToken, ( req, res ) => {
+app.post('/', [mdAutenticacion.verifyToken, mdAutenticacion.verifyAdmin], ( req, res ) => {
 
      var body = req.body;
 
@@ -77,7 +108,7 @@ app.post('/', mdAutenticacion.verifyToken, ( req, res ) => {
           
           res.status(201).json({
                ok: true,
-               user: saveComp,
+               company: saveComp,
                adminUser: req.user
           })
      } )
@@ -87,7 +118,7 @@ app.post('/', mdAutenticacion.verifyToken, ( req, res ) => {
 // ================================================
 // PUT update company
 // ================================================
-app.put('/:id', mdAutenticacion.verifyToken, ( req, res ) => {
+app.put('/:id', [mdAutenticacion.verifyToken, mdAutenticacion.verifyAdmin], ( req, res ) => {
 
      var id = req.params.id;
      var body = req.body;
@@ -123,7 +154,7 @@ app.put('/:id', mdAutenticacion.verifyToken, ( req, res ) => {
                }
                res.status(200).json({
                     ok: true,
-                    user: compSaved
+                    company: compSaved
                });
 
           } );
@@ -134,7 +165,7 @@ app.put('/:id', mdAutenticacion.verifyToken, ( req, res ) => {
 // ================================================
 // DELETE delete by id user
 // ================================================
-app.delete('/:id', mdAutenticacion.verifyToken, ( req, res ) => {
+app.delete('/:id', [mdAutenticacion.verifyToken, mdAutenticacion.verifyAdmin], ( req, res ) => {
      var id = req.params.id;
 
      Company.findByIdAndRemove( id, ( err, compDeleted ) => {

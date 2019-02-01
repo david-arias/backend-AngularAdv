@@ -21,7 +21,7 @@ app.get('/', ( req, res, next ) => {
      var from = req.query.from || 0;
      from = Number(from);
 
-     Usuario.find({}, 'userName userMail img role')
+     Usuario.find({}, 'userName userMail img role google')
           .skip(from)
           .limit(5)
           .exec(
@@ -93,7 +93,7 @@ app.post('/', ( req, res ) => {
 // ================================================
 // PUT update user
 // ================================================
-app.put( '/:id', mdAutenticacion.verifyToken , ( req, res ) => {
+app.put( '/:id', [mdAutenticacion.verifyToken, mdAutenticacion.verifyAdminOrUser] , ( req, res ) => {
 
      var id = req.params.id;
      var body = req.body;
@@ -145,7 +145,7 @@ app.put( '/:id', mdAutenticacion.verifyToken , ( req, res ) => {
 // ================================================
 // DELETE delete by id user
 // ================================================
-app.delete( '/:id', mdAutenticacion.verifyToken , ( req,res ) => {
+app.delete( '/:id', [mdAutenticacion.verifyToken, mdAutenticacion.verifyAdmin] , ( req,res ) => {
      var id = req.params.id;
 
      Usuario.findByIdAndRemove( id, ( err, userDeleted ) => {
